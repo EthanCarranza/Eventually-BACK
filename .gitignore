@@ -1,8 +1,11 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 /node_modules
 .env
 .vercel
 =======
+=======
+>>>>>>> Stashed changes
 # Node modules
 node_modules/
 
@@ -30,4 +33,7 @@ build/
 
 # Others
 *.tgz
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
