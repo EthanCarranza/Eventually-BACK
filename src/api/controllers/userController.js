@@ -170,11 +170,34 @@ const updateImage = async (req, res, next) => {
   }
 };
 
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res
+        .status(HTTP_RESPONSES.NOT_FOUND)
+        .json({ message: "Usuario no encontrado" });
+    }
+
+    await User.findByIdAndDelete(id);
+    return res
+      .status(HTTP_RESPONSES.OK)
+      .json({ message: "Perfil eliminado correctamente." });
+  } catch (error) {
+    console.error("Error al eliminar el perfil:", error);
+    return res
+      .status(HTTP_RESPONSES.INTERNAL_SERVER_ERROR)
+      .json({ message: "Error interno del servidor." });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
   register,
+  login,
   updateUser,
   updateImage,
-  login,
+  deleteUser,
 };

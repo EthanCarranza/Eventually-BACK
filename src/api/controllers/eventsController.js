@@ -120,10 +120,86 @@ const addAttendee = async (req, res, next) => {
   }
 };
 
+const removeAttendee = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(HTTP_RESPONSES.BAD_REQUEST).json("Id faltante");
+    }
+
+    const oldEvent = await Event.findById(id);
+    if (!oldEvent) {
+      return res.status(HTTP_RESPONSES.NOT_FOUND).json("Evento no encontrado");
+    }
+
+    const userId = req.user._id.toString();
+    const updates = {};
+
+    if (
+      oldEvent.attendees.map((attendee) => attendee.toString()).includes(userId)
+    ) {
+      updates.attendees = oldEvent.attendees.filter(
+        (attendee) => attendee.toString() !== userId
+      );
+    }
+
+    if (JSON.stringify(updates) === "{}") {
+      return res.status(200).json({ message: "No changes" });
+    }
+
+    const eventUpdated = await Event.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    if (!eventUpdated) {
+      return res.status(HTTP_RESPONSES.NOT_FOUND).json("Evento no encontrado");
+    }
+
+    return res.status(HTTP_RESPONSES.OK).json(eventUpdated);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(HTTP_RESPONSES.INTERNAL_SERVER_ERROR)
+      .json(HTTP_RESPONSES.INTERNAL_SERVER_ERROR.message);
+  }
+};
+
+const deleteEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const event = await Event.findById(id);
+    if (!event) {
+      return res
+        .status(HTTP_RESPONSES.NOT_FOUND)
+        .json({ message: "Usuario no encontrado" });
+    }
+
+    const userId = req.user._id.toString();
+    if (event.creator.toString() !== userId) {
+      return res
+        .status(HTTP_RESPONSES.FORBIDDEN)
+        .json({ message: "No tienes permiso para eliminar este evento" });
+    }
+
+    await Event.findByIdAndDelete(id);
+    return res
+      .status(HTTP_RESPONSES.OK)
+      .json({ message: "Evento eliminado correctamente." });
+  } catch (error) {
+    console.error("Error al eliminar el evento:", error);
+    return res
+      .status(HTTP_RESPONSES.INTERNAL_SERVER_ERROR)
+      .json({ message: "Error interno del servidor." });
+  }
+};
+
 module.exports = {
   getEvents,
   getEventById,
   getEventByTitle,
   createEvent,
+  deleteEvent,
   addAttendee,
+  removeAttendee,
 };
