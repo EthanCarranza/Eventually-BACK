@@ -17,7 +17,7 @@ usersRouter.get("/:id", getUserById);
 usersRouter.post("/register", register);
 usersRouter.post("/login", login);
 usersRouter.put("/:id", isAuth, updateUser);
-usersRouter.put("/profileImage/:id", upload.single("img"), isAuth, updateImage);
+usersRouter.put("/profileImage/:id", isAuth, upload.single("img"), updateImage);
 usersRouter.delete("/:id", isAuth, deleteUser);
 
 module.exports = usersRouter;
